@@ -27,11 +27,12 @@ var quizController=(function(){
      };
      return {
        addQuestionOnLocalStorage:function(newQuestText,opts){
-         var optionsArr,corrAns,questionId,newQuestion,getStoredQuests;
+         var optionsArr,corrAns,questionId,newQuestion,getStoredQuests,isChecked;
          if(questionLocalStorage.getQuestionCollection()===null){
            questionLocalStorage.setQuestionCollection([]);
          }
          optionsArr=[];
+         isChecked=false;
          questionId=0;
          for(var i=0;i<opts.length;i++){
            if(opts[i].value!==""){
@@ -39,6 +40,7 @@ var quizController=(function(){
            }
            if(opts[i].previousElementSibling.checked && opts[i].value !==""){
              corrAns=opts[i].value;
+             isChecked=true;
            }
 
          }
@@ -48,12 +50,33 @@ var quizController=(function(){
          else{
            questionId=0;
          }
+         if(newQuestText.value!=""){
+           if(optionsArr.length>1){
+             if(isChecked){
+               newQuestion=new Question(questionId,newQuestText.value,optionsArr,corrAns);
+               getStoredQuests=questionLocalStorage.getQuestionCollection();
+               getStoredQuests.push(newQuestion);
+               questionLocalStorage.setQuestionCollection(getStoredQuests);
+               newQuestText.value="";
+               for(var x=0;x<opts.length;x++){
+                 opts[x].value="";
+                 opts[x].previousElementSibling.checked=false;
+               }
 
-         newQuestion=new Question(questionId,newQuestText.value,optionsArr,corrAns);
-         getStoredQuests=questionLocalStorage.getQuestionCollection();
-         getStoredQuests.push(newQuestion);
-         questionLocalStorage.setQuestionCollection(getStoredQuests);
-         console.log(questionLocalStorage.getQuestionCollection());
+               console.log(questionLocalStorage.getQuestionCollection());
+             }
+             else{
+               alert("You missed to check correct answer ");
+                 }
+         }
+         else{
+             alert("You have to insert two options");
+           }
+         }
+
+       else{
+         alert('Please, Insert Question');
+       }
      }
    };
 })();
