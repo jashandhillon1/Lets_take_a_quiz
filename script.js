@@ -120,13 +120,15 @@ var UIController = (function() {
 
     var domItems = {
         //*******Admin Panel Elements********/
-        questInsertBtn: document.getElementById('question-insert-btn'), // 6
-        newQuestionText: document.getElementById('new-question-text'), // 15
-        adminOptions: document.querySelectorAll('.admin-option'), // 16
-        adminOptionsContainer: document.querySelector(".admin-options-container"), // 65
-        insertedQuestsWrapper: document.querySelector(".inserted-questions-wrapper"), // 83
-        questUpdateBtn: document.getElementById('question-update-btn'), // 133
-        questDeleteBtn: document.getElementById('question-delete-btn') // 134
+        questInsertBtn: document.getElementById('question-insert-btn'),
+        newQuestionText: document.getElementById('new-question-text'),
+        adminOptions: document.querySelectorAll('.admin-option'),
+        adminOptionsContainer: document.querySelector(".admin-options-container"),
+        insertedQuestsWrapper: document.querySelector(".inserted-questions-wrapper"),
+        questUpdateBtn: document.getElementById('question-update-btn'),
+        questDeleteBtn: document.getElementById('question-delete-btn'),
+        questClearBtn:document.getElementById('questions-clear-btn')
+
     };
 
     return {
@@ -180,8 +182,41 @@ var UIController = (function() {
                 domItems.questUpdateBtn.style.visibility = 'visible';
 
                 domItems.questInsertBtn.style.visibility = 'hidden';
-
+                domItems.questClearBtn.style.pointerEvents='none';
                 addInpsDynFn();
+                var updateQuestion=function(){
+                  var newOptions,optionEls;
+                  optionEls=document.querySelectorAll(".admin-option");
+                  newOptions=[];
+                  foundItem.questionText=domItems.newQuestionText.value;
+                  foundItem.correctAnswer='';
+                  for(var i=0;i<optionEls.length;i++){
+                    if(optionEls.value!==''){
+                      newOptions.push(optionEls[i].value);
+                      if(optionEls[i].previousElementSibling.checked){
+                        foundItem.correctAnswer=optionEls[i].value;
+                      }
+                    }
+                  }
+                  foundItem.options=newOptions;
+                  if(foundItem.questionText!==''){
+                    if(foundItem.options.length>1){
+                      if(foundItem.correctAnswer!==''){
+                  getStorageQuestList.splice(placeInArr,1,foundItem);
+                  storageQuestList.setQuestionCollection(getStorageQuestList);
+                }else{
+                  alert('You missed to check coorect anwser,or you checked answer without value');
+                }
+              }else{
+                  alert('You must insert at least two options');
+                }
+              }else{
+                  alert('Please, insert options');
+                }
+                }
+                domItems.questUpdateBtn.onclick=updateQuestion;
+
+
             }
 
         }
@@ -300,7 +335,7 @@ var quizController=(function(){
              alert("You have to insert two options");
              return false;
            }
-           
+
          }
 
        else{
