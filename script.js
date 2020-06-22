@@ -300,6 +300,7 @@ var quizController=(function(){
              alert("You have to insert two options");
              return false;
            }
+           
          }
 
        else{
