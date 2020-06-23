@@ -157,7 +157,7 @@ var UIController = (function() {
                 domItems.insertedQuestsWrapper.insertAdjacentHTML('afterbegin', questHTML);
             }
         },
-        editQuestList: function(event, storageQuestList, addInpsDynFn) {
+        editQuestList: function(event, storageQuestList, addInpsDynFn,updateQuestListFn) {
             var getId, getStorageQuestList, foundItem, placeInArr, optionHTML;
             if('question-'.indexOf(event.target.id)) {
                 getId = parseInt(event.target.id.split('-')[1]);
@@ -204,6 +204,17 @@ var UIController = (function() {
                       if(foundItem.correctAnswer!==''){
                   getStorageQuestList.splice(placeInArr,1,foundItem);
                   storageQuestList.setQuestionCollection(getStorageQuestList);
+                  domItems.newQuestionText.value=' ';
+                  for (var i=0;i<optionEls.length;i++){
+                    optionEls[i].value='';
+                    optionEls[i].previousElementSibling.checked=false;
+                  }
+                  domItems.questDeleteBtn.style.visibility = 'hidden';
+                  domItems.questUpdateBtn.style.visibility = 'hidden';
+
+                  domItems.questInsertBtn.style.visibility = 'visible';
+                  domItems.questClearBtn.style.pointerEvents='';
+                  updateQuestListFn(storageQuestList);
                 }else{
                   alert('You missed to check coorect anwser,or you checked answer without value');
                 }
@@ -242,7 +253,7 @@ var controller = (function(quizCtrl, UICtrl) {
     });
 
     selectedDomItems.insertedQuestsWrapper.addEventListener('click', function(e) {
-        UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically);
+        UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically,UICtrl.createQuestionList);
     });
 
 })(quizController, UIController);
