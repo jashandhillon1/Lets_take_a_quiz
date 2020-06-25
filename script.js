@@ -31,8 +31,14 @@ var quizController = (function() {
     if(questionLocalStorage.getQuestionCollection() === null) {
         questionLocalStorage.setQuestionCollection([]);
     }
+    var quizProgress={
+      questionIndex:0
+    };
+
+
 
     return {
+      getQuizProgress:quizProgress,
 
         getQuestionLocalStorage: questionLocalStorage,
 
@@ -127,8 +133,10 @@ var UIController = (function() {
         insertedQuestsWrapper: document.querySelector(".inserted-questions-wrapper"),
         questUpdateBtn: document.getElementById('question-update-btn'),
         questDeleteBtn: document.getElementById('question-delete-btn'),
-        questClearBtn:document.getElementById('questions-clear-btn')
-
+        questClearBtn:document.getElementById('questions-clear-btn'),
+        //********************QUIZ section element************/
+        askedQuesText:document.getElementById("asked-question-text"),
+        quizOptionsWrapper:document.querySelector(".quiz-options-wrapper")
     };
 
     return {
@@ -252,8 +260,22 @@ var UIController = (function() {
             }
           }
         }
+      },
+      displayQuestion:function(storageQuestList,progress){
+        var newOptionHTML,characterArr;
+        characterArr=['A','B','C','D','E','F'];
+        if(storageQuestList.getQuestionCollection().length>0){
+          domItems.askedQuesText.textContent=storageQuestList.getQuestionCollection()[progress.questionIndex].questionText;
+          domItems.quizOptionsWrapper.innerHTML='';
+          for (var i=0;i<storageQuestList.getQuestionCollection()[progress.questionIndex].options.length;i++){
+            newOptionHTML='<div class="choice-'+ i +'"><span class="choice-'+ i +'">'+ characterArr[i] +'</span><p  class="choice-'+ i +'">'+ storageQuestList.getQuestionCollection()[progress.questionIndex].options[i] +'</p></div>';
+            domItems.quizOptionsWrapper.insertAdjacentHTML('beforeend',newOptionHTML);
+          }
+
         }
+      }
     };
+
 
 })();
 
@@ -269,7 +291,7 @@ var controller = (function(quizCtrl, UICtrl) {
         var adminOptions = document.querySelectorAll('.admin-option');
         var checkBoolean = quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
         if(checkBoolean) {
-            UICtrl.createQuestionList(quizCtrl.getQuestionLocalStorage);
+            UICtrl.createQuestionList(quizCtrl.getQuestionLocalStorage,quizCtrl.getQuizProgress);
         }
 
     });
@@ -280,6 +302,7 @@ var controller = (function(quizCtrl, UICtrl) {
     selectedDomItems.questClearBtn.addEventListener('click',function(){
       UICtrl.clearQuestList(quizCtrl.getQuestionLocalStorage);
     });
+    UICtrl.displayQuestion(quizCtrl.getQuestionLocalStorage,quizCtrl.getQuizProgress);
 })(quizController, UIController);
 
 
