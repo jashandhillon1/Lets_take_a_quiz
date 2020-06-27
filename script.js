@@ -118,7 +118,7 @@ var quizController = (function() {
         },
         checkAnswer: function(ans) {
             if(questionLocalStorage.getQuestionCollection()[quizProgress.questionIndex].correctAnswer === ans.textContent) {
-
+              currPersonData.score++;
                 return true;
             } else {
 
@@ -142,7 +142,8 @@ var quizController = (function() {
           console.log(newPerson);
         },
         getCurrPersonData:currPersonData,
-        getAdminFullName:adminFullName
+        getAdminFullName:adminFullName,
+        getPersonLocalStorage:personLocalStorage
     };
 
 })();
@@ -163,6 +164,7 @@ var UIController = (function() {
         questUpdateBtn: document.getElementById('question-update-btn'),
         questDeleteBtn: document.getElementById('question-delete-btn'),
         questsClearBtn: document.getElementById('questions-clear-btn'),
+        resultListWrapper:document.querySelector(".results-list-wrapper"),
         //*******Quiz Section Elements*********/
         quizSection:document.querySelector(".quiz-container"),
         askedQuestText: document.getElementById('asked-question-text'),
@@ -178,7 +180,10 @@ var UIController = (function() {
         landPageSection: document.querySelector(".landing-page-container"),
         startQuizBtn:document.getElementById("start-quiz-btn"),
         firstNameInput:document.getElementById("firstname"),
-        lastNameInput:document.getElementById("lastname")
+        lastNameInput:document.getElementById("lastname"),
+        ///**********FINAL RESULT********///
+        finalResultSection:document.querySelector(".final-result-container"),
+        finalScoreText:document.getElementById("final-score-text")
     };
 
     return {
@@ -378,7 +383,21 @@ var UIController = (function() {
       }else{
         alert('Please enter your firstname and lastname');
       }
-        }
+    },
+    finalResult: function(currPerson){
+      domItems.finalScoreText.textContent=currPerson.fullname[0] + ' ' + currPerson.fullname[1] + ', your final score is ' + currPerson.score;
+      domItems.quizSection.style.display='none';
+      domItems.finalResultSection.style.display='block';
+    },
+    addResultOnPanel:function(userData){
+      var resultHTML;
+      domItems.resultListWrapper.innerHTML='';
+      for(var i=0;i<userData.getPersonData().length;i++){
+        resultHTML='<p class="person person-'+ i +'"><span class="person-'+ i +'">'+ userData.getPersonData()[i].firstname + ' '+ userData.getPersonData()[i].lastname + ' - '+ userData.getPersonData()[i].score +' Points</span><button id="delete-result-btn_'+ userData.getPersonData()[i].id + '" class="delete-result-btn">Delete</button></p>'
+      domItems.resultListWrapper.insertAdjacentHTML('afterbegin',resultHTML);
+      }
+
+    }
     };
 
 })();
@@ -424,7 +443,8 @@ var controller = (function(quizCtrl, UICtrl) {
                   if(quizCtrl.isFinised()){
                     //Finish quiz
                     quizCtrl.addPerson();
-                    console.log('Finised');
+                    UICtrl.finalResult(quizCtrl.getCurrPersonData);
+
 
                   }else{
                     UICtrl.resetDesign();
@@ -453,5 +473,5 @@ var controller = (function(quizCtrl, UICtrl) {
         }
       })
     });
-
+    UICtrl.addResultOnPanel(quizCtrl.getPersonLocalStorage);
 })(quizController, UIController);
